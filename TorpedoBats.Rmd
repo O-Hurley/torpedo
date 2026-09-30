@@ -12,6 +12,58 @@ knitr::opts_chunk$set(echo = TRUE)
 ## R Markdown
 
 ```{r}
-dat <- 
+library(tidyverse)
+url <- "https://github.com/O-Hurley/torpedo/raw/refs/heads/main/data/batdat.csv"
+
+batdat <- read_csv(url)
 ```
+### Clean Data
+```{r}
+# Reduce dataset to 24-25
+batdat_analysis <- batdat %>%
+  filter(Season %in% c(2024, 2025))
+# create hr_rate variable
+batdat_analysis <- batdat_analysis %>%
+  mutate(
+    hr_rate = HR / PA
+  )
+# filter to players with 300+ at bats across any number of teams
+batdat_analysis <- batdat_analysis %>%
+  group_by(`Player-additional`) %>%
+  filter(
+    n_distinct(Season) == 2,
+    all(PA >= 300)
+  ) %>%
+  ungroup()
+# how many appear in both seasons?
+batdat %>%
+  filter(Season %in% c(2024, 2025)) %>%
+  group_by(`Player-additional`) %>%
+  summarise(
+    seasons = n_distinct(Season)
+  ) %>%
+  count(seasons)
+
+#apply to larger dataset
+
+batdat_panel <- batdat %>%
+  filter(Season %in% c(2024, 2025)) %>%
+  group_by(`Player-additional`) %>%
+  filter(
+    n_distinct(Season) == 2,
+    min(PA) >= 300
+  ) %>%
+  ungroup() %>%
+  mutate(HR_rate = HR / PA) %>%
+  
+  batdat_panel %>%
+  count(Season)
+```
+
+
+
+
+
+
+
 
